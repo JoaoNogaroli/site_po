@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PO Interativa | Programação Linear no Browser</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      color: #1a1a1a;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .products-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .product {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .product-name {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .product-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .product-icon.a { background: #6366f1; }
+    .product-icon.b { background: #14b8a6; }
+
+    .slider-group {
+      margin-bottom: 0.75rem;
+    }
+
+    .slider-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+    }
+
+    .slider-label {
+      color: #666;
+    }
+
+    .slider-value {
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .resources-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .result-card {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .result-item {
+      padding: 0.5rem;
+    }
+
+    .result-value {
+      font-size: 2rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .result-label {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .usage-bar {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .usage-title {
+      font-size: 0.75rem;
+      opacity: 0.9;
+      margin-bottom: 0.75rem;
+    }
+
+    .usage-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .usage-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      margin-bottom: 4px;
+    }
+
+    .bar-bg {
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: white;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    details {
+      margin-top: 0.5rem;
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: #666;
+      padding: 0.5rem 0;
+    }
+
+    summary:hover {
+      color: #1a1a1a;
+    }
+
+    .code-block {
+      background: #1a1a1a;
+      color: #e5e5e5;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .math-block {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 0.75rem;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #999;
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .info-box {
+      background: #f0f9ff;
+      border-left: 3px solid #0ea5e9;
+      padding: 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.875rem;
+      color: #0c4a6e;
+      margin-bottom: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔬 PO Interativa</h1>
+      <p class="subtitle">Resolva problemas de Programação Linear no browser</p>
+    </header>
+
+    <div class="info-box">
+      <strong>Problema:</strong> Uma fábrica produz dois produtos (A e B). Cada um consome recursos limitados (horas de máquina e mão de obra). Quanto produzir de cada para maximizar o lucro?
+    </div>
+
+    <div class="card">
+      <div class="card-title">Parâmetros dos produtos</div>
+      <div class="products-grid">
+        <div class="product">
+          <div class="product-name">
+            <span class="product-icon a">A</span>
+            Produto A
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Lucro unitário</span>
+              <span class="slider-value">R$ <span id="lucroA-val">40</span></span>
+            </div>
+            <input type="range" min="10" max="100" value="40" step="5" id="lucroA">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Horas máquina</span>
+              <span class="slider-value"><span id="maqA-val">2</span>h</span>
+            </div>
+            <input type="range" min="0.5" max="5" value="2" step="0.5" id="maqA">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Horas mão de obra</span>
+              <span class="slider-value"><span id="moA-val">1</span>h</span>
+            </div>
+            <input type="range" min="0.5" max="4" value="1" step="0.5" id="moA">
+          </div>
+        </div>
+
+        <div class="product">
+          <div class="product-name">
+            <span class="product-icon b">B</span>
+            Produto B
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Lucro unitário</span>
+              <span class="slider-value">R$ <span id="lucroB-val">30</span></span>
+            </div>
+            <input type="range" min="10" max="100" value="30" step="5" id="lucroB">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Horas máquina</span>
+              <span class="slider-value"><span id="maqB-val">1</span>h</span>
+            </div>
+            <input type="range" min="0.5" max="5" value="1" step="0.5" id="maqB">
+          </div>
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="slider-label">Horas mão de obra</span>
+              <span class="slider-value"><span id="moB-val">2</span>h</span>
+            </div>
+            <input type="range" min="0.5" max="4" value="2" step="0.5" id="moB">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recursos disponíveis</div>
+      <div class="resources-grid">
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Horas de máquina</span>
+            <span class="slider-value"><span id="capMaq-val">100</span>h</span>
+          </div>
+          <input type="range" min="20" max="200" value="100" step="10" id="capMaq">
+        </div>
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Horas de mão de obra</span>
+            <span class="slider-value"><span id="capMO-val">80</span>h</span>
+          </div>
+          <input type="range" min="20" max="200" value="80" step="10" id="capMO">
+        </div>
+      </div>
+    </div>
+
+    <div class="card result-card">
+      <div class="card-title" style="color: rgba(255,255,255,0.8);">Solução ótima</div>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-value" id="solA">40</div>
+          <div class="result-label">unidades de A</div>
+        </div>
+        <div class="result-item">
+          <div class="result-value" id="solB">20</div>
+          <div class="result-label">unidades de B</div>
+        </div>
+        <div class="result-item">
+          <div class="result-value" id="lucroTotal">R$ 2.200</div>
+          <div class="result-label">lucro máximo</div>
+        </div>
+      </div>
+      <div class="usage-bar">
+        <div class="usage-title">Utilização dos recursos</div>
+        <div class="usage-item">
+          <div class="usage-header">
+            <span>Máquina</span>
+            <span id="useMaq">100%</span>
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" id="barMaq" style="width: 100%"></div>
+          </div>
+        </div>
+        <div class="usage-item">
+          <div class="usage-header">
+            <span>Mão de obra</span>
+            <span id="useMO">100%</span>
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" id="barMO" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <details>
+        <summary>📐 Ver modelo matemático</summary>
+        <div class="math-block" id="modelo">
+max Z = 40A + 30B
+s.a.:
+    2A + 1B ≤ 100  (máquina)
+    1A + 2B ≤ 80   (mão de obra)
+    A, B ≥ 0
+        </div>
+      </details>
+
+      <details>
+        <summary>💻 Ver código JavaScript</summary>
+        <div class="code-block" id="codigo"></div>
+      </details>
+    </div>
+
+    <footer>
+      Feito com <a href="https://github.com/JWally/jsLPSolver" target="_blank">javascript-lp-solver</a><br>
+      Solver Simplex rodando 100% no seu browser
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/javascript-lp-solver/prod/solver.js"></script>
+  <script>
+    const ids = ['lucroA','lucroB','maqA','maqB','moA','moB','capMaq','capMO'];
+    const els = {};
+    ids.forEach(id => {
+      els[id] = document.getElementById(id);
+      els[id + '-val'] = document.getElementById(id + '-val');
+    });
+
+    function solve() {
+      const lucroA = parseFloat(els.lucroA.value);
+      const lucroB = parseFloat(els.lucroB.value);
+      const maqA = parseFloat(els.maqA.value);
+      const maqB = parseFloat(els.maqB.value);
+      const moA = parseFloat(els.moA.value);
+      const moB = parseFloat(els.moB.value);
+      const capMaq = parseFloat(els.capMaq.value);
+      const capMO = parseFloat(els.capMO.value);
+
+      // Atualiza os valores exibidos
+      ids.forEach(id => {
+        if (els[id + '-val']) els[id + '-val'].textContent = els[id].value;
+      });
+
+      // Monta o modelo
+      const model = {
+        optimize: "lucro",
+        opType: "max",
+        constraints: {
+          maquina: { max: capMaq },
+          maoDeObra: { max: capMO }
+        },
+        variables: {
+          A: { lucro: lucroA, maquina: maqA, maoDeObra: moA },
+          B: { lucro: lucroB, maquina: maqB, maoDeObra: moB }
+        }
+      };
+
+      // Resolve
+      const result = solver.Solve(model);
+      
+      const solA = Math.round((result.A || 0) * 100) / 100;
+      const solB = Math.round((result.B || 0) * 100) / 100;
+      const lucroTotal = Math.round(result.result || 0);
+
+      // Atualiza resultados
+      document.getElementById('solA').textContent = solA;
+      document.getElementById('solB').textContent = solB;
+      document.getElementById('lucroTotal').textContent = 'R$ ' + lucroTotal.toLocaleString('pt-BR');
+
+      // Calcula utilização dos recursos
+      const usedMaq = solA * maqA + solB * maqB;
+      const usedMO = solA * moA + solB * moB;
+      const percMaq = Math.round((usedMaq / capMaq) * 100);
+      const percMO = Math.round((usedMO / capMO) * 100);
+
+      document.getElementById('useMaq').textContent = percMaq + '%';
+      document.getElementById('useMO').textContent = percMO + '%';
+      document.getElementById('barMaq').style.width = percMaq + '%';
+      document.getElementById('barMO').style.width = percMO + '%';
+
+      // Atualiza modelo matemático
+      document.getElementById('modelo').textContent = 
+`max Z = ${lucroA}A + ${lucroB}B
+s.a.:
+    ${maqA}A + ${maqB}B ≤ ${capMaq}  (máquina)
+    ${moA}A + ${moB}B ≤ ${capMO}   (mão de obra)
+    A, B ≥ 0`;
+
+      // Atualiza código
+      document.getElementById('codigo').textContent = 
+`const model = {
+  optimize: "lucro",
+  opType: "max",
+  constraints: {
+    maquina: { max: ${capMaq} },
+    maoDeObra: { max: ${capMO} }
+  },
+  variables: {
+    A: { lucro: ${lucroA}, maquina: ${maqA}, maoDeObra: ${moA} },
+    B: { lucro: ${lucroB}, maquina: ${maqB}, maoDeObra: ${moB} }
+  }
+};
+
+const result = solver.Solve(model);
+// → { A: ${solA}, B: ${solB}, result: ${lucroTotal}, feasible: true }`;
+    }
+
+    // Adiciona listeners e resolve inicialmente
+    ids.forEach(id => els[id].addEventListener('input', solve));
+    solve();
+  </script>
+</body>
+</html>
